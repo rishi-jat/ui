@@ -20,11 +20,15 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   }
 
   if (!data?.isAuthenticated) {
+    const errorMessage =
+      location.state?.errorMessage ||
+      new URLSearchParams(window.location.search).get('errorMessage') ||
+      'Please sign in to continue';
     return (
       <Navigate
         to="/login"
         state={{
-          errorMessage: 'Please sign in to continue',
+          errorMessage,
           from: location.pathname,
         }}
         replace

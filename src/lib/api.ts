@@ -36,8 +36,18 @@ api.interceptors.response.use(
     // Don't show toast for 401 errors on verification endpoint to prevent
     // unnecessary error messages during auth checks
     const isAuthCheck = error.config?.url?.includes('/api/me');
-    if (error.response?.status === 401 && isAuthCheck) {
-      console.log('Auth verification failed, ignoring toast');
+    if (error.response?.status === 401) {
+      if (isAuthCheck) {
+        console.log('Auth verification failed, ignoring toast');
+      } else {
+        toast.error('Your session has expired. Please sign in again.');
+        // Redirect to login with error message and current path
+        if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
+          window.location.replace(
+            `/login?errorMessage=${encodeURIComponent('Your session has expired. Please sign in again.')}&from=${encodeURIComponent(window.location.pathname)}`
+          );
+        }
+      }
     } else {
       toast.error(errorMessage);
     }

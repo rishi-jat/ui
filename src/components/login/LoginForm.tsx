@@ -78,35 +78,43 @@ const LoginForm = () => {
   }, []);
 
   useEffect(() => {
+    let errorMessage = undefined;
+    let infoMessage = undefined;
+    let from = undefined;
     if (location.state) {
-      const { errorMessage, infoMessage, from } = location.state as {
+      ({ errorMessage, infoMessage, from } = location.state as {
         errorMessage?: string;
         infoMessage?: string;
         from?: string;
-      };
+      });
+    } else {
+      // Check query params if not in state
+      const params = new URLSearchParams(window.location.search);
+      errorMessage = params.get('errorMessage') || undefined;
+      from = params.get('from') || undefined;
+    }
 
-      if (from) {
-        localStorage.setItem('redirectAfterLogin', from);
-        console.log(
-          `[LoginForm] Stored redirect path "${from}" at ${performance.now() - renderStartTime.current}ms`
-        );
-      }
+    if (from) {
+      localStorage.setItem('redirectAfterLogin', from);
+      console.log(
+        `[LoginForm] Stored redirect path "${from}" at ${performance.now() - renderStartTime.current}ms`
+      );
+    }
 
-      if (errorMessage) {
-        toast.error(errorMessage, { id: 'auth-redirect-error' });
-        console.log(
-          `[LoginForm] Displayed error message "${errorMessage}" at ${performance.now() - renderStartTime.current}ms`
-        );
-        navigate(location.pathname, { replace: true, state: {} });
-      }
+    if (errorMessage) {
+      toast.error(errorMessage, { id: 'auth-redirect-error' });
+      console.log(
+        `[LoginForm] Displayed error message "${errorMessage}" at ${performance.now() - renderStartTime.current}ms`
+      );
+      navigate(location.pathname, { replace: true, state: {} });
+    }
 
-      if (infoMessage) {
-        toast.success(infoMessage, { id: 'auth-redirect-info' });
-        console.log(
-          `[LoginForm] Displayed info message "${infoMessage}" at ${performance.now() - renderStartTime.current}ms`
-        );
-        navigate(location.pathname, { replace: true, state: {} });
-      }
+    if (infoMessage) {
+      toast.success(infoMessage, { id: 'auth-redirect-info' });
+      console.log(
+        `[LoginForm] Displayed info message "${infoMessage}" at ${performance.now() - renderStartTime.current}ms`
+      );
+      navigate(location.pathname, { replace: true, state: {} });
     }
 
     const tokenRemovalTime = localStorage.getItem('tokenRemovalTime');
